@@ -5,7 +5,7 @@ on:
 
 jobs:
   branch-checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - id: get-branch
         run: |
@@ -21,7 +21,7 @@ jobs:
   handle-latest:
     needs: branch-checks
     if: ${{ needs.branch-checks.outputs.is-latest-branch == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +30,7 @@ jobs:
   get-next-release-branch:
     needs: branch-checks
     if: ${{ needs.branch-checks.outputs.is-next-branch == 'true' || needs.branch-checks.outputs.is-release-branch == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +52,7 @@ jobs:
   create-next-release-branch:
     needs: [branch-checks, get-next-release-branch]
     if: ${{ needs.branch-checks.outputs.is-next-branch == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -70,7 +70,7 @@ jobs:
   next-release-branch-check:
     if: ${{ always() }}
     needs: [branch-checks, get-next-release-branch]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - run: |
           IS_NEXT_RELEASE_BRANCH=${{ needs.branch-checks.outputs.branch == needs.get-next-release-branch.outputs.branch }}
@@ -88,9 +88,8 @@ jobs:
 
   request-create-frontpage-branch:
     if: ${{ always() }}
-    needs:
-      [branch-checks, next-release-branch-check, create-next-release-branch]
-    runs-on: ubuntu-latest
+    needs: [branch-checks, next-release-branch-check, create-next-release-branch]
+    runs-on: ubuntu-24.04
     steps:
       - if: ${{ needs.branch-checks.outputs.is-actionable-branch == 'true' && needs.branch-checks.outputs.is-latest-branch == 'false' && needs.next-release-branch-check.outputs.check == 'false' }}
         run: |

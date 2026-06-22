@@ -10,13 +10,14 @@ on:
       - next
       - main
 
+      - master
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   get-branch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - id: get-branch
         env:
@@ -37,7 +38,7 @@ jobs:
       branch: ${{ env.branch }}
 
   get-parameters:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - if: github.event_name == 'pull_request_target' && ((github.event.action == 'labeled' && github.event.label.name == 'ci:normal') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:normal')))
         run: echo "workflow=normal" >> $GITHUB_ENV
@@ -53,14 +54,14 @@ jobs:
       ghPrNumber: ${{ github.event.pull_request.number }}
 
   trigger-circle-ci-workflow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [get-branch, get-parameters]
     if: needs.get-parameters.outputs.workflow != ''
     steps:
       - name: Trigger Normal tests
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://circleci.com/api/v2/project/gh/storybookjs/storybook/pipeline'
-          method: 'POST'
+          url: https://circleci.com/api/v2/project/gh/storybookjs/storybook/pipeline
+          method: POST
           customHeaders: '{"Content-Type": "application/json", "Circle-Token": "${{ secrets.CIRCLE_CI_TOKEN }}"}'
           data: '{ "branch": "${{needs.get-branch.outputs.branch}}", "parameters": ${{toJson(needs.get-parameters.outputs)}} }'

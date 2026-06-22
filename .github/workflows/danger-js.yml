@@ -11,6 +11,7 @@ on:
       - main
       - next
 
+      - master
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}
   cancel-in-progress: true
@@ -19,12 +20,12 @@ name: Danger JS
 jobs:
   dangerJS:
     name: Danger JS
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: .nvmrc
       - name: Danger JS
         uses: danger/danger-js@11.2.6
         env:

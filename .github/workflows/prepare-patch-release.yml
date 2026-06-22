@@ -18,7 +18,7 @@ concurrency:
 jobs:
   prepare-patch-pull-request:
     name: Prepare patch pull request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: release
     defaults:
       run:
@@ -33,7 +33,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: .nvmrc
 
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -74,10 +74,7 @@ jobs:
         run: yarn release:unreleased-changes-exists --unpicked-patches
 
       - name: Fetch next branch
-        run:
-          # depth needs to be set to a high enough number that it will contain all the merge commits to cherry-pick
-          # as of May 2023, the whole repo had 55K commits
-          git fetch --depth=2000 origin next
+        run: git fetch --depth=2000 origin next
 
       - name: Pick patches
         id: pick-patches
@@ -123,7 +120,7 @@ jobs:
         run: |
           yarn release:write-changelog ${{ steps.versions.outputs.next }} --unpicked-patches --verbose
 
-      - name: "Commit changes to branch: version-patch-from-${{ steps.versions.outputs.current }}"
+      - name: 'Commit changes to branch: version-patch-from-${{ steps.versions.outputs.current }}'
         working-directory: .
         run: |
           git config --global user.name 'storybook-bot'
@@ -185,4 +182,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_MONITORING_URL }}
         uses: Ilshidur/action-discord@master
         with:
-          args: "The GitHub Action for preparing the release pull request bumping from v${{ steps.versions.outputs.current }} to v${{ steps.versions.outputs.next }} (triggered by ${{ github.triggering_actor }}) failed! See run at: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          args: 'The GitHub Action for preparing the release pull request bumping from v${{ steps.versions.outputs.current }} to v${{ steps.versions.outputs.next }} (triggered by ${{ github.triggering_actor }}) failed! See run at: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'

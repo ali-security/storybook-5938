@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: "Which release type to use for bumping the version"
+        description: Which release type to use for bumping the version
         required: true
-        default: "prerelease"
+        default: prerelease
         type: choice
         options:
           - prerelease
@@ -36,7 +36,7 @@ concurrency:
 jobs:
   prepare-non-patch-pull-request:
     name: Prepare non-patch pull request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: release
     defaults:
       run:
@@ -54,7 +54,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: .nvmrc
 
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -119,7 +119,7 @@ jobs:
         run: |
           yarn release:write-changelog ${{ steps.bump-version.outputs.next-version }} --verbose
 
-      - name: "Commit changes to branch: version-non-patch-from-${{ steps.bump-version.outputs.current-version }}"
+      - name: 'Commit changes to branch: version-non-patch-from-${{ steps.bump-version.outputs.current-version }}'
         working-directory: .
         run: |
           git config --global user.name 'storybook-bot'
@@ -162,4 +162,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_MONITORING_URL }}
         uses: Ilshidur/action-discord@master
         with:
-          args: "The GitHub Action for preparing the release pull request bumping from v${{ steps.bump-version.outputs.current-version }} to v${{ steps.bump-version.outputs.next-version }} (triggered by ${{ github.triggering_actor }}) failed! See run at: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          args: 'The GitHub Action for preparing the release pull request bumping from v${{ steps.bump-version.outputs.current-version }} to v${{ steps.bump-version.outputs.next-version }} (triggered by ${{ github.triggering_actor }}) failed! See run at: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
